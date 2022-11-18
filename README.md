@@ -6,10 +6,10 @@ go get github.com/loudbund/go-socket
 
 ## 引入
 ```golang
-import "github.com/loudbund/go-socket/socket_v1"
+import "github.com/loudbund/go-socket2/socket2"
 ```
 ## 消息协议格式
-1. socket_v1.UDataSocket 这个是应用程序方使用的数据协议结构体，收到消息和发送消息都用这个结构
+1. socket2.UDataSocket 这个是应用程序方使用的数据协议结构体，收到消息和发送消息都用这个结构
 2. Ctype为消息类型：建议应用从100开始使用；已被使用的有1,7,8，分别是 1：心跳，7：客户端连上后自动给服务器发条消息 8：服务器回复客户端的7类型消息
 3. Content为传输内容：较大的传输时， Zlib可以开启，这样可以减少传输字节，当然也会消耗cpu性能
 
@@ -40,7 +40,7 @@ type unitDataSend struct {
 ```
 ## 传输协议 SendFlag设置
 ```golang
-socket_v1.SetSendFlag(xxxxx)
+socket2.SetSendFlag(xxxxx)
 ```
 
 ## 服务端示例
@@ -50,16 +50,16 @@ package main
 
 import (
 	"fmt"
-	"github.com/loudbund/go-socket/socket_v1"
+	"github.com/loudbund/go-socket2/socket2"
 	"time"
 )
 
 var (
-	Server *socket_v1.Server
+	Server *socket2.Server
 )
 
 // 1、处理数据,多线程转单线程处理
-func onHookEvent(Event socket_v1.HookEvent) {
+func onHookEvent(Event socket2.HookEvent) {
 	// 事件处理在此处 ///////////////////////////////////////////////////////////////
 	switch Event.EventType {
 	case "message": // 1、消息事件
@@ -76,14 +76,14 @@ func main() {
 	port := 2222
 
 	// 1、创建服务器
-    socket_v1.SetSendFlag(123456)
-	Server = socket_v1.NewServer("0.0.0.0", port, func(Event socket_v1.HookEvent) {
+    socket2.SetSendFlag(123456)
+	Server = socket2.NewServer("0.0.0.0", port, func(Event socket2.HookEvent) {
 		onHookEvent(Event)
 	})
 
 	// 演示用: 循环发消息
 	for {
-		_ = Server.SendMsg(nil, socket_v1.UDataSocket{
+		_ = Server.SendMsg(nil, socket2.UDataSocket{
 			Zlib:    1,               // 是否压缩传输 1:压缩 0:不压缩
 			CType:   1000,            // 指令编号
 			Content: []byte("hello"), // 指令内容
@@ -100,34 +100,34 @@ package main
 
 import (
 	"fmt"
-	"github.com/loudbund/go-socket/socket_v1"
+	"github.com/loudbund/go-socket2/socket2"
 	"time"
 )
 
 // 1.1、收到了消息回调函数，这里处理消息
-func OnMessage(Msg socket_v1.UDataSocket, C *socket_v1.Client) {
+func OnMessage(Msg socket2.UDataSocket, C *socket2.Client) {
 	onMsg(Msg)
 }
 
 // 1.2、连接失败回调函数
-func OnConnectFail(C *socket_v1.Client) {
+func OnConnectFail(C *socket2.Client) {
 	fmt.Println(time.Now().Format("2006-01-02 15:04:05"), "连接失败！5秒后重连")
 	go C.ReConnect(5) // 延时5秒后重连
 }
 
 // 1.3、连接成功回调函数
-func OnConnect(C *socket_v1.Client) {
+func OnConnect(C *socket2.Client) {
 	fmt.Println(time.Now().Format("2006-01-02 15:04:05"), "连接成功！")
 }
 
 // 1.4、掉线回调函数
-func OnDisConnect(C *socket_v1.Client) {
+func OnDisConnect(C *socket2.Client) {
 	fmt.Println(time.Now().Format("2006-01-02 15:04:05"), "掉线了,5秒后重连")
 	go C.ReConnect(5) // 延时5秒后重连
 }
 
 // 2、消息处理
-func onMsg(Msg socket_v1.UDataSocket) {
+func onMsg(Msg socket2.UDataSocket) {
 	fmt.Println(Msg.CType, string(Msg.Content))
 }
 
@@ -137,8 +137,8 @@ func main() {
 	serverPort := 2222
 
 	// 创建客户端连接
-    socket_v1.SetSendFlag(123456)
-	Client := socket_v1.NewClient(serverIp, serverPort, OnMessage, OnConnectFail, OnConnect, OnDisConnect)
+    socket2.SetSendFlag(123456)
+	Client := socket2.NewClient(serverIp, serverPort, OnMessage, OnConnectFail, OnConnect, OnDisConnect)
 	go Client.Connect()
 
 	// 处理其他逻辑
