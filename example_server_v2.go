@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/loudbund/go-socket-v2/socket2"
+	"github.com/loudbund/go-socket2/socket2"
 	"time"
 )
 

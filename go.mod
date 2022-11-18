@@ -1,3 +1,3 @@
-module github.com/loudbund/go-socket-v2
+module github.com/loudbund/go-socket2
 
 go 1.16
