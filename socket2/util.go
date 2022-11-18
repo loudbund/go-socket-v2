@@ -1,4 +1,4 @@
-package socket_v2
+package socket2
 
 import (
 	"bytes"
