@@ -91,8 +91,8 @@ func (Me *socketMsg) getSocketMsg(conn net.Conn, fSuccess func(msg *UDataSocket)
 			return errors.New("传输码校验失败")
 		}
 
-		// 读取内容数据
-		if headerData.Zlib == 1 && headerData.ContentTranLength > 1*1024 {
+		// 读取内容数据;CType==1表示消息为消息头
+		if headerData.CType == 1 && headerData.ContentTranLength > 1*1024 {
 			fmt.Println("头消息不能超过1K")
 			return errors.New("头消息不能超过1K")
 		}
